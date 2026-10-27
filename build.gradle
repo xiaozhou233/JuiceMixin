@@ -15,6 +15,12 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    // 生成 Java 8 字节码，保证能加载进 Java 8 的宿主进程
+    options.release = 8
+}
+
 test {
     useJUnitPlatform()
 }
