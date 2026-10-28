@@ -4,10 +4,8 @@ import cn.xiaozhou233.juicemixin.utils.AnnotationUtils;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
 
 import java.lang.annotation.*;
-import java.util.List;
 
 /**
  * 声明当前类是目标类的 mixin。
@@ -26,9 +24,9 @@ import java.util.List;
 public @interface Mixin {
 
     /**
-     * 目标类，可以有多个。同一个 mixin 里的注入方法必须对所有目标都成立。
+     * 目标类。
      */
-    Class<?>[] value();
+    Class<?> value();
 
 
     class Helper {
@@ -39,29 +37,29 @@ public @interface Mixin {
                 return null;
             }
 
-            List<Type> types = AnnotationUtils.getAnnotationValue(annotation, "value");
+            Type type = AnnotationUtils.getAnnotationValue(annotation, "value");
+            if (type == null) {
+                throw new IllegalStateException("Mixin annotation has no target class");
+            }
 
-            Class<?>[] classes = types.stream()
-                    .map(Type::getClassName)
-                    .map(name -> {
-                        try {
-                            return Class.forName(
-                                    name,
-                                    false,
-                                    Thread.currentThread().getContextClassLoader()
-                            );
-                        } catch (ClassNotFoundException e) {
-                            throw new IllegalStateException(
-                                    "Cannot load mixin target: " + name, e
-                            );
-                        }
-                    })
-                    .toArray(Class<?>[]::new);
+            String name = type.getClassName();
+            Class<?> target;
+            try {
+                target = Class.forName(
+                        name,
+                        false,
+                        Thread.currentThread().getContextClassLoader()
+                );
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException(
+                        "Cannot load mixin target: " + name, e
+                );
+            }
 
             return new Mixin() {
                 @Override
-                public Class<?>[] value() {
-                    return classes.clone();
+                public Class<?> value() {
+                    return target;
                 }
 
                 @Override

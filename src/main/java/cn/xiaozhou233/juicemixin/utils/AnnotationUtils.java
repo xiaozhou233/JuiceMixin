@@ -1,7 +1,5 @@
 package cn.xiaozhou233.juicemixin.utils;
 
-import cn.xiaozhou233.juicemixin.annotations.Mixin;
-import cn.xiaozhou233.juicemixin.data.annotations.MixinData;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;

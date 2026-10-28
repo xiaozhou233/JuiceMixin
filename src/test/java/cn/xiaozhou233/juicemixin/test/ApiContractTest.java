@@ -29,7 +29,7 @@ class ApiContractTest {
     void mixinDeclaresTargetClass() {
         Mixin mixin = TargetClassMixin.class.getAnnotation(Mixin.class);
         assertNotNull(mixin);
-        assertArrayEquals(new Class<?>[]{TargetClass.class}, mixin.value());
+        assertEquals(TargetClass.class, mixin.value());
     }
 
     @Test
