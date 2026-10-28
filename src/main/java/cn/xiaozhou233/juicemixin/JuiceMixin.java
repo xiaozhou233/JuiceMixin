@@ -27,4 +27,7 @@ public class JuiceMixin {
         JuiceMixin.loggerProvider = loggerProvider != null
                 ? loggerProvider : new DefaultLogger();
     }
+
+    public static void init() { init(null,null,null);}
+    public static void init(ClassProvider classProvider, BytecodeProvider bytecodeProvider) { init(classProvider, bytecodeProvider, null);}
 }
