@@ -4,7 +4,7 @@ import cn.xiaozhou233.juicemixin.provider.LoggerProvider;
 
 import java.util.Arrays;
 
-public class DefaultLogger implements LoggerProvider {
+public class DefaultLoggerProvider implements LoggerProvider {
 
     @Override
     public void info(String str, Object... o) {
