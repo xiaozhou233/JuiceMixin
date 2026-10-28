@@ -1,5 +1,9 @@
 package cn.xiaozhou233.juicemixin.annotations;
 
+import cn.xiaozhou233.juicemixin.utils.AnnotationUtils;
+import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.tree.MethodNode;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -19,4 +23,18 @@ public @interface Arg {
 
     /** 参数序号，从 0 开始，不含 {@code this}。 */
     int value();
+
+    class Helper {
+
+        /**
+         * Get the Arg annotation value for a parameter.
+         */
+        public static Integer getValue(MethodNode methodNode, int parameterIndex) {
+            AnnotationNode annotation = AnnotationUtils.getParameterAnnotation(
+                    methodNode, parameterIndex, Arg.class
+            );
+
+            return AnnotationUtils.getAnnotationValue(annotation, "value");
+        }
+    }
 }

@@ -14,11 +14,11 @@ import org.jetbrains.annotations.Nullable;
 
 public class JuiceMixin {
     @Getter
-    private static ClassProvider classProvider;
+    private static ClassProvider classProvider = new DefaultClassProvider();
     @Getter
-    private static BytecodeProvider bytecodeProvider;
+    private static BytecodeProvider bytecodeProvider = new DefaultBytecodeProvider();
     @Getter
-    private static LoggerProvider loggerProvider;
+    private static LoggerProvider loggerProvider = new DefaultLoggerProvider();
     @Setter
     @Getter
     private static OutputProvider outputProvider = new EmptyOutputProvider();

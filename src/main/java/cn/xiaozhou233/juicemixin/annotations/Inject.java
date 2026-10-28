@@ -1,11 +1,10 @@
 package cn.xiaozhou233.juicemixin.annotations;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Repeatable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import cn.xiaozhou233.juicemixin.utils.AnnotationUtils;
+import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.tree.MethodNode;
+
+import java.lang.annotation.*;
 
 /**
  * 把 mixin 里的一个方法挂到目标方法的指定位置上。
@@ -40,5 +39,68 @@ public @interface Inject {
     @Target(ElementType.METHOD)
     @interface List {
         Inject[] value();
+    }
+
+    class Helper {
+
+        public static java.util.List<Inject> getAnnotations(MethodNode node) {
+            AnnotationNode annotation = AnnotationUtils.getAnnotation(node, Inject.class);
+
+            if (annotation != null) {
+                return java.util.Collections.singletonList(getAnnotation(annotation));
+            }
+
+            AnnotationNode container = AnnotationUtils.getAnnotation(node, List.class);
+            if (container == null) {
+                return java.util.Collections.emptyList();
+            }
+
+            java.util.List<AnnotationNode> annotations =
+                    AnnotationUtils.getAnnotationValue(container, "value");
+
+            if (annotations == null) {
+                return java.util.Collections.emptyList();
+            }
+
+            return annotations.stream()
+                    .map(Helper::getAnnotation)
+                    .collect(java.util.stream.Collectors.toList());
+        }
+
+        public static Inject getAnnotation(AnnotationNode node) {
+            if (!AnnotationUtils.isAnnotation(node, Inject.class)) {
+                return null;
+            }
+
+            String method = AnnotationUtils.getAnnotationValue(node, "method");
+            String desc = AnnotationUtils.getAnnotationValue(node, "desc");
+
+            AnnotationNode atNode = AnnotationUtils.getAnnotationValue(node, "at");
+            At at = atNode == null
+                    ? At.Helper.getDefaultAnnotation()
+                    : At.Helper.getAnnotation(atNode);
+
+            return new Inject() {
+                @Override
+                public String method() {
+                    return method;
+                }
+
+                @Override
+                public String desc() {
+                    return desc;
+                }
+
+                @Override
+                public At at() {
+                    return at;
+                }
+
+                @Override
+                public Class<? extends Annotation> annotationType() {
+                    return Inject.class;
+                }
+            };
+        }
     }
 }

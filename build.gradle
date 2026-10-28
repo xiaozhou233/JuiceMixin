@@ -20,6 +20,29 @@ dependencies {
     // Source: https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly 'org.projectlombok:lombok:1.18.48'
     annotationProcessor 'org.projectlombok:lombok:1.18.48'
+
+    // Source: https://mvnrepository.com/artifact/org.ow2.asm/asm
+    implementation 'org.ow2.asm:asm:9.11.1'
+    // Source: https://mvnrepository.com/artifact/org.ow2.asm/asm-commons
+    implementation 'org.ow2.asm:asm-commons:9.11.1'
+    // Source: https://mvnrepository.com/artifact/org.ow2.asm/asm-util
+    implementation 'org.ow2.asm:asm-util:9.11.1'
+    // Source: https://mvnrepository.com/artifact/org.ow2.asm/asm-tree
+    implementation 'org.ow2.asm:asm-tree:9.11.1'
+    // Source: https://mvnrepository.com/artifact/org.ow2.asm/asm-analysis
+    implementation 'org.ow2.asm:asm-analysis:9.11.1'
+
+    // Source: https://mvnrepository.com/artifact/org.ow2.asm/asm
+    testImplementation 'org.ow2.asm:asm:9.11.1'
+    // Source: https://mvnrepository.com/artifact/org.ow2.asm/asm-commons
+    testImplementation 'org.ow2.asm:asm-commons:9.11.1'
+    // Source: https://mvnrepository.com/artifact/org.ow2.asm/asm-util
+    testImplementation 'org.ow2.asm:asm-util:9.11.1'
+    // Source: https://mvnrepository.com/artifact/org.ow2.asm/asm-tree
+    testImplementation 'org.ow2.asm:asm-tree:9.11.1'
+    // Source: https://mvnrepository.com/artifact/org.ow2.asm/asm-analysis
+    testImplementation 'org.ow2.asm:asm-analysis:9.11.1'
+
 }
 
 java {

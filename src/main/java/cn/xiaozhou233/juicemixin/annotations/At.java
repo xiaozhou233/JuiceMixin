@@ -1,9 +1,9 @@
 package cn.xiaozhou233.juicemixin.annotations;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import cn.xiaozhou233.juicemixin.utils.AnnotationUtils;
+import org.objectweb.asm.tree.AnnotationNode;
+
+import java.lang.annotation.*;
 
 /**
  * 注入点描述，只能作为 {@link Inject#at()} 的值使用，不能标在任何声明上。
@@ -52,5 +52,97 @@ public @interface At {
     enum Shift {
         BEFORE,
         AFTER
+    }
+
+    class Helper {
+
+        public static At getAnnotation(AnnotationNode node) {
+            if (!AnnotationUtils.isAnnotation(node, At.class)) {
+                return null;
+            }
+
+            Kind kind = getEnumValue(node, "value", Kind.class, Kind.HEAD);
+            String target = getValue(node, "target", "");
+            int ordinal = getValue(node, "ordinal", -1);
+            Shift shift = getEnumValue(node, "shift", Shift.class, Shift.BEFORE);
+
+            return new At() {
+                @Override
+                public Kind value() {
+                    return kind;
+                }
+
+                @Override
+                public String target() {
+                    return target;
+                }
+
+                @Override
+                public int ordinal() {
+                    return ordinal;
+                }
+
+                @Override
+                public Shift shift() {
+                    return shift;
+                }
+
+                @Override
+                public Class<? extends Annotation> annotationType() {
+                    return At.class;
+                }
+            };
+        }
+
+        private static <T> T getValue(
+                AnnotationNode node, String name, T defaultValue
+        ) {
+            T value = AnnotationUtils.getAnnotationValue(node, name);
+            return value != null ? value : defaultValue;
+        }
+
+        private static <E extends Enum<E>> E getEnumValue(
+                AnnotationNode node,
+                String name,
+                Class<E> enumClass,
+                E defaultValue
+        ) {
+            String[] value = AnnotationUtils.getAnnotationValue(node, name);
+
+            if (value == null || value.length < 2) {
+                return defaultValue;
+            }
+
+            return Enum.valueOf(enumClass, value[1]);
+        }
+
+        public static At getDefaultAnnotation() {
+            return new At() {
+                @Override
+                public Kind value() {
+                    return Kind.HEAD;
+                }
+
+                @Override
+                public String target() {
+                    return "";
+                }
+
+                @Override
+                public int ordinal() {
+                    return -1;
+                }
+
+                @Override
+                public Shift shift() {
+                    return Shift.BEFORE;
+                }
+
+                @Override
+                public Class<? extends Annotation> annotationType() {
+                    return At.class;
+                }
+            };
+        }
     }
 }
