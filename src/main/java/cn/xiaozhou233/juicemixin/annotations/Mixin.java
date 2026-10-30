@@ -8,15 +8,17 @@ import org.objectweb.asm.tree.ClassNode;
 import java.lang.annotation.*;
 
 /**
- * 声明当前类是目标类的 mixin。
+ * Declares the current class as a mixin for the target class.
  *
- * <p>被标记的类必须满足：
+ * <p>The annotated class must:
  * <ul>
- *   <li>是 {@code public}、非 {@code abstract} 的普通类；</li>
- *   <li>提供无参构造器。框架会为<b>每一个目标实例</b>创建一个 mixin 实例并缓存起来。</li>
+ *   <li>be an ordinary {@code public}, non-{@code abstract} class;</li>
+ *   <li>provide a no-arg constructor. The framework creates and caches one mixin
+ *       instance for <b>every target instance</b>.</li>
  * </ul>
  *
- * <p>因此 mixin 的成员字段是跟着目标实例走的状态，不同目标实例之间互不影响。
+ * <p>Therefore a mixin's member fields hold state that follows the target
+ * instance; different target instances do not affect each other.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -24,7 +26,7 @@ import java.lang.annotation.*;
 public @interface Mixin {
 
     /**
-     * 目标类。
+     * The target class.
      */
     Class<?> value();
 

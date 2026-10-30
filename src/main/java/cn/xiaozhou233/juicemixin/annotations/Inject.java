@@ -7,17 +7,19 @@ import org.objectweb.asm.tree.MethodNode;
 import java.lang.annotation.*;
 
 /**
- * 把 mixin 里的一个方法挂到目标方法的指定位置上。
+ * Attaches a method declared in a mixin to a specific position in a target method.
  *
- * <p>注入方法必须是 {@code public} 的<b>实例方法</b>，返回类型为 {@code void}。
- * 形参只能来自 {@link This}、{@link Arg}、{@link Result} 以及
- * {@link cn.xiaozhou233.juicemixin.CallbackInfo}，顺序不限；
- * {@code CallbackInfo} 如果出现，必须是最后一个参数。
+ * <p>An injector method must be a {@code public} <b>instance method</b> with a
+ * {@code void} return type. Its only permitted parameter type is
+ * {@link cn.xiaozhou233.juicemixin.CallbackInfo}; if present, it must be the last
+ * parameter.
  *
- * <p>同一个方法上可以叠加多个 {@code @Inject}（见 {@link Repeatable}），
- * 此时这份形参列表必须对所有注入点都合法。
+ * <p>Multiple {@code @Inject} annotations may be stacked on the same method
+ * (see {@link Repeatable}); in that case the parameter list must be valid for
+ * every injection point.
  *
- * <p>匹配失败（目标方法不存在、描述符不符、注入点找不到）会直接抛异常，不会静默跳过。
+ * <p>A failed match (missing target method, descriptor mismatch, injection point
+ * not found) throws an exception and is never skipped silently.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -25,13 +27,13 @@ import java.lang.annotation.*;
 @Repeatable(Inject.List.class)
 public @interface Inject {
 
-    /** 目标方法名；构造器写 {@code "<init>"}。 */
+    /** Name of the target method; use {@code "<init>"} for constructors. */
     String method();
 
-    /** 目标方法的 JVM 描述符，精确匹配，例如 {@code "(ILjava/lang/String;)V"}。 */
+    /** Exact JVM descriptor of the target method, e.g. {@code "(ILjava/lang/String;)V"}. */
     String desc();
 
-    /** 注入点，缺省为 {@link At.Kind#HEAD}。 */
+    /** Injection point; defaults to {@code "HEAD"}. */
     At at() default @At;
 
     @Documented

@@ -1,3 +1,4 @@
+
 package cn.xiaozhou233.juicemixin.annotations;
 
 import cn.xiaozhou233.juicemixin.utils.AnnotationUtils;
@@ -6,48 +7,35 @@ import org.objectweb.asm.tree.AnnotationNode;
 import java.lang.annotation.*;
 
 /**
- * 注入点描述，只能作为 {@link Inject#at()} 的值使用，不能标在任何声明上。
+ * Describes an injection point. It may only be used as the value of
+ * {@link Inject#at()} and cannot annotate any declaration.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({})
 public @interface At {
 
-    /** 注入点类型，缺省为 {@link Kind#HEAD}。 */
-    Kind value() default Kind.HEAD;
+    /** Injection point type; defaults to {@code HEAD}. */
+    String value() default "HEAD";
 
     /**
-     * 目标成员签名，只有 {@link Kind#INVOKE}、{@link Kind#FIELD}、{@link Kind#CONSTANT} 会用到。
-     * 格式为 {@code "类名.成员名描述符"}，例如
-     * {@code "java/io/PrintStream.println(Ljava/lang/String;)V"}。
+     * Signature of the target member. Only used by INVOKE, FIELD and CONSTANT.
+     * The format is {@code "owner.nameDescriptor"}, for example
+     * {@code "java/io/PrintStream.println(Ljava/lang/String;)V"}.
      */
     String target() default "";
 
     /**
-     * 第几个匹配项。{@code -1} 表示全部匹配，{@code >= 0} 表示只取第 N 个（从 0 开始）。
+     * Which match to use. {@code -1} means all matches; {@code >= 0} selects only
+     * the N-th match (zero-based).
      */
     int ordinal() default -1;
 
     /**
-     * 插在匹配指令之前还是之后，只有
-     * {@link Kind#INVOKE}、{@link Kind#FIELD}、{@link Kind#CONSTANT} 会用到。
+     * Whether to insert before or after the matched instruction. Only used by
+     * INVOKE, FIELD and CONSTANT.
      */
     Shift shift() default Shift.BEFORE;
-
-    enum Kind {
-        /** 方法体第一条指令之前。 */
-        HEAD,
-        /** 每一条 return 指令之前。 */
-        RETURN,
-        /** 方法体最后一条 return 指令之前。 */
-        TAIL,
-        /** 匹配到的方法调用处。 */
-        INVOKE,
-        /** 匹配到的字段访问处。 */
-        FIELD,
-        /** 匹配到的常量压栈处。 */
-        CONSTANT
-    }
 
     enum Shift {
         BEFORE,
@@ -61,15 +49,15 @@ public @interface At {
                 return null;
             }
 
-            Kind kind = getEnumValue(node, "value", Kind.class, Kind.HEAD);
+            String value = getValue(node, "value", "HEAD");
             String target = getValue(node, "target", "");
             int ordinal = getValue(node, "ordinal", -1);
             Shift shift = getEnumValue(node, "shift", Shift.class, Shift.BEFORE);
 
             return new At() {
                 @Override
-                public Kind value() {
-                    return kind;
+                public String value() {
+                    return value;
                 }
 
                 @Override
@@ -119,8 +107,8 @@ public @interface At {
         public static At getDefaultAnnotation() {
             return new At() {
                 @Override
-                public Kind value() {
-                    return Kind.HEAD;
+                public String value() {
+                    return "HEAD";
                 }
 
                 @Override
