@@ -5,20 +5,23 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Declares the current class as a mixin for the target class.
- *
- * <p>The annotated class must:
- * <ul>
- *   <li>be an ordinary {@code public}, non-{@code abstract} class;</li>
- *   <li>provide a no-arg constructor. The framework creates and caches one mixin
- *       instance for <b>every target instance</b>.</li>
- * </ul>
- *
- * <p>Therefore a mixin's member fields hold state that follows the target
- * instance; different target instances do not affect each other.
+ * Marks a class as a mixin and declares the class its code is mixed into.
+ * <p>
+ * Mixing happens at runtime, so the target class must already be loaded and
+ * resolvable by the context class loader when the mixin is processed. The
+ * annotation therefore cannot be used to declare a target that does not exist
+ * (yet) in the running JVM.
+ * <p>
+ * Retention is {@link RetentionPolicy#RUNTIME} so the annotation stays readable
+ * through reflection as well; the transformer itself reads the bytecode form.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -26,13 +29,40 @@ import java.lang.annotation.*;
 public @interface Mixin {
 
     /**
-     * The target class.
+     * The class to mix into. It is read back from the bytecode as a {@link Type}
+     * and then resolved through the context class loader, which is why the
+     * target has to be loadable at transform time.
+     *
+     * @return the target class
      */
     Class<?> value();
 
-
+    /**
+     * Helper for reading {@link Mixin} from a {@link ClassNode}.
+     * <p>
+     * The returned instance is a lightweight anonymous implementation rebuilt
+     * from the bytecode, not the annotation proxy the JVM would create. It
+     * therefore does not implement the {@code equals}/{@code hashCode}/
+     * {@code toString} contract of {@link java.lang.annotation.Annotation};
+     * do not use it as a map key and do not compare it with a reflective
+     * annotation instance.
+     */
     class Helper {
 
+        /** Prevents instantiation: this class only exposes static helpers. */
+        private Helper() {
+        }
+
+        /**
+         * Reads and resolves the {@link Mixin} annotation of a mixin class.
+         *
+         * @param node the {@link ClassNode} of the mixin class
+         * @return the resolved annotation, or {@code null} if the class is not
+         *         annotated with {@link Mixin}
+         * @throws IllegalStateException if the annotation carries no target class
+         *                               or the target class cannot be loaded by
+         *                               the context class loader
+         */
         public static Mixin getAnnotation(ClassNode node) {
             AnnotationNode annotation = AnnotationUtils.getAnnotation(node, Mixin.class);
             if (annotation == null) {
