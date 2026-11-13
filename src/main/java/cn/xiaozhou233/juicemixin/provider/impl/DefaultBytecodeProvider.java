@@ -1,31 +1,40 @@
 package cn.xiaozhou233.juicemixin.provider.impl;
 
-import cn.xiaozhou233.juicemixin.JuiceMixin;
 import cn.xiaozhou233.juicemixin.provider.BytecodeProvider;
-import cn.xiaozhou233.juicemixin.utils.IOUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Reads class bytes from the class loader that loaded the class, falling back to
+ * the system class loader for bootstrap classes.
+ */
 public class DefaultBytecodeProvider implements BytecodeProvider {
 
     @Override
-    public byte[] get(Class<?> clazz) {
-        String resourcePath = clazz.getName().replace('.', '/') + ".class";
-        ClassLoader classLoader = clazz.getClassLoader();
+    public byte[] get(Class<?> type) {
+        String resourceName = type.getName().replace('.', '/') + ".class";
+        ClassLoader classLoader = type.getClassLoader();
 
         try (InputStream inputStream = classLoader != null
-                ? classLoader.getResourceAsStream(resourcePath)
-                : ClassLoader.getSystemResourceAsStream(resourcePath)) {
+                ? classLoader.getResourceAsStream(resourceName)
+                : ClassLoader.getSystemResourceAsStream(resourceName)) {
 
             if (inputStream == null) {
-                JuiceMixin.getLoggerProvider().error("Cannot find bytecode for class: " + clazz.getName());
                 return null;
             }
 
-            return IOUtils.readStream(inputStream);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            int read;
+
+            while ((read = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, read);
+            }
+
+            return outputStream.toByteArray();
         } catch (IOException e) {
-            JuiceMixin.getLoggerProvider().error("Failed to read bytecode for class: " + clazz.getName());
             return null;
         }
     }

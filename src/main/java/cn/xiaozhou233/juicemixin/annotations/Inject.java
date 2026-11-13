@@ -1,18 +1,11 @@
 package cn.xiaozhou233.juicemixin.annotations;
 
-import cn.xiaozhou233.juicemixin.utils.AnnotationUtils;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.MethodNode;
-
-import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Collections;
-import java.util.stream.Collectors;
 
 /**
  * Marks a method as a mixin handler and describes where its code is injected
@@ -64,8 +57,8 @@ public @interface Inject {
      * annotations. Not intended to be used directly.
      * <p>
      * Since this nested type is itself called {@code List}, {@code java.util.List}
-     * has to be referenced by its fully qualified name everywhere inside
-     * {@link Inject}.
+     * has to be referenced by its fully qualified name wherever it would
+     * otherwise clash inside this file.
      */
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
@@ -77,112 +70,5 @@ public @interface Inject {
          * @return the repeated annotations
          */
         Inject[] value();
-    }
-
-    /**
-     * Helper for reading {@link Inject} annotations from bytecode.
-     * <p>
-     * Returned instances are lightweight anonymous implementations rebuilt from
-     * the bytecode, not the annotation proxies the JVM would create. They do not
-     * implement the {@code equals}/{@code hashCode}/{@code toString} contract of
-     * {@link Annotation}; do not use them as map keys and do not compare them
-     * with reflective annotation instances.
-     */
-    class Helper {
-
-        /** Prevents instantiation: this class only exposes static helpers. */
-        private Helper() {
-        }
-
-        /**
-         * Collects every {@link Inject} annotation declared on a method.
-         * <p>
-         * A method compiles to either a single {@link Inject} annotation or a
-         * single {@link List} container, never to both. If both are present, which
-         * only hand written bytecode can produce, the container is ignored.
-         *
-         * @param node the method to read from
-         * @return every declared annotation in declaration order, or an empty
-         *         list if the method is not annotated. The empty and
-         *         single-annotation cases return shared immutable instances, so
-         *         callers must not modify the returned list.
-         */
-        public static java.util.List<Inject> getAnnotations(MethodNode node) {
-            AnnotationNode annotation = AnnotationUtils.getAnnotation(node, Inject.class);
-
-            if (annotation != null) {
-                return Collections.singletonList(getAnnotation(annotation));
-            }
-
-            AnnotationNode container = AnnotationUtils.getAnnotation(node, List.class);
-            if (container == null) {
-                return Collections.emptyList();
-            }
-
-            java.util.List<AnnotationNode> annotations =
-                    AnnotationUtils.getAnnotationValue(container, "value");
-
-            if (annotations == null) {
-                return Collections.emptyList();
-            }
-
-            return annotations.stream()
-                    .map(Helper::getAnnotation)
-                    .collect(Collectors.toList());
-        }
-
-        /**
-         * Parses a single {@link Inject} annotation node.
-         *
-         * @param node the annotation node to parse
-         * @return the parsed annotation, or {@code null} if the node is not an
-         *         {@link Inject} annotation
-         */
-        public static Inject getAnnotation(AnnotationNode node) {
-            if (!AnnotationUtils.isAnnotation(node, Inject.class)) {
-                return null;
-            }
-
-            String method = AnnotationUtils.getAnnotationValue(node, "method");
-            String desc = AnnotationUtils.getAnnotationValue(node, "desc");
-
-            AnnotationNode atNode = AnnotationUtils.getAnnotationValue(node, "at");
-            At at = atNode == null
-                    ? At.Helper.getDefaultAnnotation()
-                    : At.Helper.getAnnotation(atNode);
-
-            return new Inject() {
-                @Override
-                public String method() {
-                    return method;
-                }
-
-                @Override
-                public String desc() {
-                    return desc;
-                }
-
-                @Override
-                public At at() {
-                    return at;
-                }
-
-                @Override
-                public Class<? extends Annotation> annotationType() {
-                    return Inject.class;
-                }
-            };
-        }
-
-        /**
-         * Get first {@link Inject} annotation of a method, or {@code null} if the method is not annotated.
-         * @param node the method to read from
-         * @return the first declared annotation, or {@code null}
-         */
-        public static Inject getAnnotation(MethodNode node) {
-            java.util.List<Inject> annotations = getAnnotations(node);
-
-            return annotations.isEmpty() ? null : annotations.get(0);
-        }
     }
 }

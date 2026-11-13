@@ -1,9 +1,5 @@
 package cn.xiaozhou233.juicemixin.annotations;
 
-import cn.xiaozhou233.juicemixin.utils.AnnotationUtils;
-import org.objectweb.asm.tree.AnnotationNode;
-
-import java.lang.annotation.Annotation;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -36,8 +32,8 @@ public @interface At {
     /**
      * The kind of injection point.
      * <ul>
-     *   <li>{@code TAIL} - before the last {@code RETURN} instruction of the
-     *       method (default).</li>
+     *   <li>{@code TAIL} - before the last return instruction of the method
+     *       (default).</li>
      *   <li>{@code HEAD} - before the first instruction of the method, or after
      *       the {@code super(...)} / {@code this(...)} call in a constructor.</li>
      *   <li>{@code INVOKE} - before or after a matching method invocation.
@@ -102,136 +98,5 @@ public @interface At {
         BEFORE,
         /** Insert after the matched instruction. */
         AFTER
-    }
-
-    /**
-     * Helper for reading {@link At} annotations from bytecode.
-     * <p>
-     * Missing attributes fall back to the same values as the defaults declared on
-     * this annotation (Java does not store defaults in the bytecode), so the values
-     * returned here match what {@code @At} reports through reflection.
-     * <p>
-     * Returned instances are lightweight anonymous implementations, not annotation
-     * proxies: they do not implement the {@code equals}/{@code hashCode}/
-     * {@code toString} contract of {@link Annotation}.
-     */
-    class Helper {
-
-        /** Prevents instantiation: this class only exposes static helpers. */
-        private Helper() {
-        }
-
-        /** Shared instance used when the whole {@code at} attribute is absent. */
-        private static final At DEFAULT = new At() {
-            @Override
-            public String value() {
-                return "TAIL";
-            }
-
-            @Override
-            public String target() {
-                return "";
-            }
-
-            @Override
-            public int ordinal() {
-                return -1;
-            }
-
-            @Override
-            public Shift shift() {
-                return Shift.BEFORE;
-            }
-
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return At.class;
-            }
-        };
-
-        /**
-         * Parses an {@link At} annotation node, filling in declared defaults for
-         * every attribute that is not present in the bytecode.
-         *
-         * @param node the annotation node to parse
-         * @return the parsed annotation, or {@code null} if the node is not an
-         *         {@link At} annotation
-         * @throws IllegalArgumentException if the node carries an unknown
-         *                                  {@link Shift} constant
-         */
-        public static At getAnnotation(AnnotationNode node) {
-            if (!AnnotationUtils.isAnnotation(node, At.class)) {
-                return null;
-            }
-
-            String value = getValue(node, "value", "TAIL");
-            String target = getValue(node, "target", "");
-            int ordinal = getValue(node, "ordinal", -1);
-            Shift shift = getEnumValue(node, "shift", Shift.class, Shift.BEFORE);
-
-            return new At() {
-                @Override
-                public String value() {
-                    return value;
-                }
-
-                @Override
-                public String target() {
-                    return target;
-                }
-
-                @Override
-                public int ordinal() {
-                    return ordinal;
-                }
-
-                @Override
-                public Shift shift() {
-                    return shift;
-                }
-
-                @Override
-                public Class<? extends Annotation> annotationType() {
-                    return At.class;
-                }
-            };
-        }
-
-        /**
-         * Returns the annotation equivalent to a bare {@code @At}, i.e. one whose
-         * attributes are all at their declared defaults.
-         *
-         * @return the shared default instance
-         */
-        public static At getDefaultAnnotation() {
-            return DEFAULT;
-        }
-
-        private static <T> T getValue(
-                AnnotationNode node, String name, T defaultValue
-        ) {
-            T value = AnnotationUtils.getAnnotationValue(node, name);
-            return value != null ? value : defaultValue;
-        }
-
-        /**
-         * Reads an enum attribute. ASM stores enum values as a two element array
-         * holding the enum descriptor and the constant name, hence the second
-         * element.
-         */
-        private static <E extends Enum<E>> E getEnumValue(
-                AnnotationNode node,
-                String name,
-                Class<E> enumClass,
-                E defaultValue
-        ) {
-            String[] value = AnnotationUtils.getAnnotationValue(node, name);
-
-            if (value == null || value.length < 2) {
-                return defaultValue;
-            }
-
-            return Enum.valueOf(enumClass, value[1]);
-        }
     }
 }

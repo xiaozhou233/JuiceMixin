@@ -1,30 +1,23 @@
 package cn.xiaozhou233.juicemixin.example;
 
 import cn.xiaozhou233.juicemixin.JuiceMixin;
-import cn.xiaozhou233.juicemixin.Transformer;
-import cn.xiaozhou233.juicemixin.provider.impl.ClassLoaderOutputProvider;
+import cn.xiaozhou233.juicemixin.MixinConfig;
+import cn.xiaozhou233.juicemixin.MixinTransformer;
 import cn.xiaozhou233.juicemixin.provider.impl.FileOutputProvider;
-import cn.xiaozhou233.juicemixin.registries.MixinRegistry;
+import cn.xiaozhou233.juicemixin.provider.impl.MixinClassLoader;
 
 import java.util.Map;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        JuiceMixin.init();
-        JuiceMixin.setOutputProvider(new FileOutputProvider());
+        MixinConfig config = MixinConfig.builder()
+                .outputProvider(new FileOutputProvider())
+                .build();
 
-        MixinRegistry mixinRegistry = new MixinRegistry();
-        mixinRegistry.addMixin(TargetMixin.class);
+        MixinTransformer transformer = JuiceMixin.transformer(config);
+        Map<String, byte[]> transformed = transformer.transform(TargetMixin.class);
 
-        // transform() writes the classes to ./bytes and returns them, so the
-        // result can be loaded and executed right away.
-        Map<String, byte[]> transformed = new Transformer(mixinRegistry)
-                .setOutputProviderEnabled(true)
-                .transform();
-
-        ClassLoaderOutputProvider.CustomClassloader loader =
-                new ClassLoaderOutputProvider.CustomClassloader(Main.class.getClassLoader());
-
+        MixinClassLoader loader = new MixinClassLoader(Main.class.getClassLoader());
         for (Map.Entry<String, byte[]> entry : transformed.entrySet()) {
             loader.defineClass(entry.getKey(), entry.getValue());
         }

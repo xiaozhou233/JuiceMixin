@@ -1,39 +1,46 @@
 package cn.xiaozhou233.juicemixin;
 
-import cn.xiaozhou233.juicemixin.provider.BytecodeProvider;
-import cn.xiaozhou233.juicemixin.provider.ClassProvider;
-import cn.xiaozhou233.juicemixin.provider.LoggerProvider;
-import cn.xiaozhou233.juicemixin.provider.OutputProvider;
-import cn.xiaozhou233.juicemixin.provider.impl.DefaultBytecodeProvider;
-import cn.xiaozhou233.juicemixin.provider.impl.DefaultClassProvider;
-import cn.xiaozhou233.juicemixin.provider.impl.DefaultLoggerProvider;
-import cn.xiaozhou233.juicemixin.provider.impl.EmptyOutputProvider;
-import lombok.Getter;
-import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
+import java.util.Map;
 
-public class JuiceMixin {
-    @Getter
-    private static ClassProvider classProvider = new DefaultClassProvider();
-    @Getter
-    private static BytecodeProvider bytecodeProvider = new DefaultBytecodeProvider();
-    @Getter
-    private static LoggerProvider loggerProvider = new DefaultLoggerProvider();
-    @Setter
-    @Getter
-    private static OutputProvider outputProvider = new EmptyOutputProvider();
+/**
+ * Static convenience facade for the default transformer.
+ * <p>
+ * The library itself does not keep any global mutable state. Prefer constructing
+ * a {@link MixinTransformer} with an explicit {@link MixinConfig} when custom
+ * providers are needed, or when several isolated transformers are used in the
+ * same JVM.
+ */
+public final class JuiceMixin {
 
-    public static void init(@Nullable ClassProvider classProvider, @Nullable BytecodeProvider bytecodeProvider, @Nullable LoggerProvider loggerProvider) {
-        JuiceMixin.classProvider = classProvider != null
-                ? classProvider : new DefaultClassProvider();
-
-        JuiceMixin.bytecodeProvider = bytecodeProvider != null
-                ? bytecodeProvider : new DefaultBytecodeProvider();
-
-        JuiceMixin.loggerProvider = loggerProvider != null
-                ? loggerProvider : new DefaultLoggerProvider();
+    private JuiceMixin() {
     }
 
-    public static void init() { init(null,null,null);}
-    public static void init(ClassProvider classProvider, BytecodeProvider bytecodeProvider) { init(classProvider, bytecodeProvider, null);}
+    /**
+     * Creates a transformer with the default configuration.
+     *
+     * @return a new transformer
+     */
+    public static MixinTransformer transformer() {
+        return new MixinTransformer(MixinConfig.defaults());
+    }
+
+    /**
+     * Creates a transformer with an explicit configuration.
+     *
+     * @param config transformer configuration
+     * @return a new transformer
+     */
+    public static MixinTransformer transformer(MixinConfig config) {
+        return new MixinTransformer(config);
+    }
+
+    /**
+     * Convenience method that transforms mixins with the default configuration.
+     *
+     * @param mixins mixin classes annotated with {@code @Mixin}
+     * @return modified classes keyed by internal name
+     */
+    public static Map<String, byte[]> transform(Class<?>... mixins) {
+        return transformer().transform(mixins);
+    }
 }
