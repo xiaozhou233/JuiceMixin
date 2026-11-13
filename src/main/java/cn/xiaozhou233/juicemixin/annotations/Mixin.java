@@ -77,11 +77,7 @@ public @interface Mixin {
             String name = type.getClassName();
             Class<?> target;
             try {
-                target = Class.forName(
-                        name,
-                        false,
-                        Thread.currentThread().getContextClassLoader()
-                );
+                target = load(name);
             } catch (ClassNotFoundException e) {
                 throw new IllegalStateException(
                         "Cannot load mixin target: " + name, e
@@ -99,6 +95,26 @@ public @interface Mixin {
                     return Mixin.class;
                 }
             };
+        }
+
+        /**
+         * Loads the target through the context class loader, falling back to the
+         * loader of this library. The fallback keeps the target resolvable in
+         * plain JUnit/standalone runs where the context class loader is not the
+         * application class loader.
+         */
+        private static Class<?> load(String name) throws ClassNotFoundException {
+            ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+
+            if (contextLoader != null) {
+                try {
+                    return Class.forName(name, false, contextLoader);
+                } catch (ClassNotFoundException ignored) {
+                    // Try the library class loader below.
+                }
+            }
+
+            return Class.forName(name, false, Mixin.Helper.class.getClassLoader());
         }
     }
 

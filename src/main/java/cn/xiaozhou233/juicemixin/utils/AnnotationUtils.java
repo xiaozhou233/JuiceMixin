@@ -69,27 +69,14 @@ public class AnnotationUtils {
             int parameterIndex,
             Class<?> annotationClass
     ) {
-        if (parameterIndex < 0 || parameterIndex >= methodNode.visibleParameterAnnotations.length) {
-            return getInvisibleParameterAnnotation(methodNode, parameterIndex, annotationClass);
-        }
-
-        List<AnnotationNode>[] visible = methodNode.visibleParameterAnnotations;
-        List<AnnotationNode>[] invisible = methodNode.invisibleParameterAnnotations;
-
-        AnnotationNode annotation = findParameterAnnotation(visible, parameterIndex, annotationClass);
+        AnnotationNode annotation = findParameterAnnotation(
+                methodNode.visibleParameterAnnotations, parameterIndex, annotationClass
+        );
         return annotation != null
                 ? annotation
-                : findParameterAnnotation(invisible, parameterIndex, annotationClass);
-    }
-
-    private static AnnotationNode getInvisibleParameterAnnotation(
-            MethodNode methodNode,
-            int parameterIndex,
-            Class<?> annotationClass
-    ) {
-        return findParameterAnnotation(
-                methodNode.invisibleParameterAnnotations, parameterIndex, annotationClass
-        );
+                : findParameterAnnotation(
+                        methodNode.invisibleParameterAnnotations, parameterIndex, annotationClass
+                );
     }
 
     private static AnnotationNode findParameterAnnotation(

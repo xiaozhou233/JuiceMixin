@@ -20,6 +20,7 @@ public class DefaultBytecodeProvider implements BytecodeProvider {
 
             if (inputStream == null) {
                 JuiceMixin.getLoggerProvider().error("Cannot find bytecode for class: " + clazz.getName());
+                return null;
             }
 
             return IOUtils.readStream(inputStream);

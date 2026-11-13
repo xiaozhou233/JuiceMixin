@@ -173,5 +173,16 @@ public @interface Inject {
                 }
             };
         }
+
+        /**
+         * Get first {@link Inject} annotation of a method, or {@code null} if the method is not annotated.
+         * @param node the method to read from
+         * @return the first declared annotation, or {@code null}
+         */
+        public static Inject getAnnotation(MethodNode node) {
+            java.util.List<Inject> annotations = getAnnotations(node);
+
+            return annotations.isEmpty() ? null : annotations.get(0);
+        }
     }
 }

@@ -38,12 +38,16 @@ public @interface At {
      * <ul>
      *   <li>{@code TAIL} - before the last {@code RETURN} instruction of the
      *       method (default).</li>
-     *   <li>{@code HEAD} - before the first instruction of the method.</li>
-     *   <li>{@code INVOKE} / {@code FIELD} / {@code CONSTANT} - target matching
-     *       points, used together with {@link #target()} and {@link #ordinal()}.</li>
+     *   <li>{@code HEAD} - before the first instruction of the method, or after
+     *       the {@code super(...)} / {@code this(...)} call in a constructor.</li>
+     *   <li>{@code INVOKE} - before or after a matching method invocation.
+     *       {@code invokedynamic} instructions are not matched.</li>
+     *   <li>{@code FIELD} - before or after a matching field access.</li>
+     *   <li>{@code CONSTANT} - before or after a matching {@code LDC}
+     *       constant.</li>
      * </ul>
-     * The value is a plain string and is therefore not validated at compile time:
-     * a typo or an unsupported name only shows up at runtime as "nothing matched".
+     * The value is a plain string and is therefore not validated at compile time;
+     * an unknown name fails at transform time with a {@code MixinException}.
      *
      * @return the injection point kind, {@code "TAIL"} by default
      */
@@ -53,10 +57,18 @@ public @interface At {
      * Signature of the member to match, only used by {@code INVOKE}, {@code FIELD}
      * and {@code CONSTANT} points.
      * <p>
-     * Format is {@code owner + "." + name + descriptor}, where {@code owner} is an
-     * ASM internal name (slash separated, not a dotted Java name). For example
+     * {@code INVOKE} uses {@code owner + "." + name + descriptor}, for example
      * {@code "java/io/PrintStream.println(Ljava/lang/String;)V"}.
-     * The default empty string means "no member restriction".
+     * {@code FIELD} uses {@code owner + "." + name + ":" + descriptor}, for
+     * example {@code "java/lang/System.out:Ljava/io/PrintStream;"}.
+     * {@code CONSTANT} uses the textual constant value: strings are matched
+     * literally, numbers through {@link String#valueOf(Object)}, and class
+     * constants by descriptor, class name or internal name. Only {@code LDC}
+     * instructions are matched, so small integer constants that the compiler
+     * emits as {@code ICONST_*} / {@code BIPUSH} are not injection points.
+     * <p>
+     * {@code owner} is an ASM internal name (slash separated, not a dotted Java
+     * name). The default empty string matches every member of the selected kind.
      *
      * @return the member signature, {@code ""} by default
      */
@@ -75,6 +87,10 @@ public @interface At {
     /**
      * Where the injected code is placed relative to the matched instruction.
      * Defaults to {@link Shift#BEFORE}.
+     * <p>
+     * {@link Shift#AFTER} is supported by {@code INVOKE}, {@code FIELD} and
+     * {@code CONSTANT}. {@code HEAD} and {@code TAIL} only support
+     * {@link Shift#BEFORE}.
      *
      * @return the placement, {@link Shift#BEFORE} by default
      */

@@ -1,4 +1,4 @@
-package cn.xiaozhou233.juicemixin;
+package cn.xiaozhou233.juicemixin.registries;
 
 import java.util.ArrayList;
 import java.util.Collections;

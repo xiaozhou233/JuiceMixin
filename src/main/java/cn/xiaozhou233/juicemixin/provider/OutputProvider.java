@@ -1,5 +1,11 @@
 package cn.xiaozhou233.juicemixin.provider;
 
+/**
+ * Receives transformed class files.
+ * <p>
+ * {@code name} is the internal name of the class, for example
+ * {@code cn/xiaozhou233/juicemixin/example/Target}.
+ */
 public interface OutputProvider {
-    public void output(String name, byte[] bytes);
+    void output(String name, byte[] bytes);
 }
