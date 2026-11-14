@@ -1,7 +1,7 @@
 package cn.xiaozhou233.juicemixin;
 
-import cn.xiaozhou233.juicemixin.example.EarlyReturnMixin;
-import cn.xiaozhou233.juicemixin.example.MissingInvokeMixin;
+import cn.xiaozhou233.juicemixin.tests.EarlyReturnMixin;
+import cn.xiaozhou233.juicemixin.tests.MissingInvokeMixin;
 import cn.xiaozhou233.juicemixin.exception.MixinException;
 import org.junit.jupiter.api.Test;
 

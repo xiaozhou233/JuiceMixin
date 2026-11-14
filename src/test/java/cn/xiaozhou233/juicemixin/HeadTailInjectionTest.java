@@ -1,15 +1,15 @@
 package cn.xiaozhou233.juicemixin;
 
-import cn.xiaozhou233.juicemixin.example.Constructed;
-import cn.xiaozhou233.juicemixin.example.ConstructedMixin;
-import cn.xiaozhou233.juicemixin.example.Greeter;
-import cn.xiaozhou233.juicemixin.example.GreeterMixin;
-import cn.xiaozhou233.juicemixin.example.Target;
-import cn.xiaozhou233.juicemixin.example.TargetHead2Mixin;
-import cn.xiaozhou233.juicemixin.example.TargetHeadMixin;
-import cn.xiaozhou233.juicemixin.example.TargetMixin;
-import cn.xiaozhou233.juicemixin.example.TargetRepeatMixin;
-import cn.xiaozhou233.juicemixin.example.TargetTryMixin;
+import cn.xiaozhou233.juicemixin.tests.Constructed;
+import cn.xiaozhou233.juicemixin.tests.ConstructedMixin;
+import cn.xiaozhou233.juicemixin.tests.Greeter;
+import cn.xiaozhou233.juicemixin.tests.GreeterMixin;
+import cn.xiaozhou233.juicemixin.tests.Target;
+import cn.xiaozhou233.juicemixin.tests.TargetHead2Mixin;
+import cn.xiaozhou233.juicemixin.tests.TargetHeadMixin;
+import cn.xiaozhou233.juicemixin.tests.TargetMixin;
+import cn.xiaozhou233.juicemixin.tests.TargetRepeatMixin;
+import cn.xiaozhou233.juicemixin.tests.TargetTryMixin;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

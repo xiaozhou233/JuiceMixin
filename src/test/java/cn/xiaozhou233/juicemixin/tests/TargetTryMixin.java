@@ -1,4 +1,4 @@
-package cn.xiaozhou233.juicemixin.example;
+package cn.xiaozhou233.juicemixin.tests;
 
 import cn.xiaozhou233.juicemixin.annotations.Inject;
 import cn.xiaozhou233.juicemixin.annotations.Mixin;

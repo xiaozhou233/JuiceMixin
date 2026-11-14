@@ -1,17 +1,17 @@
-package cn.xiaozhou233.juicemixin.example;
+package cn.xiaozhou233.juicemixin.tests;
 
 import cn.xiaozhou233.juicemixin.annotations.At;
 import cn.xiaozhou233.juicemixin.annotations.Inject;
 import cn.xiaozhou233.juicemixin.annotations.Mixin;
 
-@Mixin(Constructed.class)
-public class ConstructedMixin {
+@Mixin(Target.class)
+public class TargetHead2Mixin {
     @Inject(
-            method = "<init>",
+            method = "run",
             desc = "()V",
             at = @At("HEAD")
     )
-    private void injectIntoConstructor() {
-        System.out.println("CTOR");
+    private void injectSecondHead() {
+        System.out.println("HEAD2");
     }
 }

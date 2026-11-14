@@ -1,10 +1,10 @@
 package cn.xiaozhou233.juicemixin;
 
-import cn.xiaozhou233.juicemixin.example.Operations;
-import cn.xiaozhou233.juicemixin.example.OperationsAfterMixin;
-import cn.xiaozhou233.juicemixin.example.OperationsMixin;
-import cn.xiaozhou233.juicemixin.example.TwoPrints;
-import cn.xiaozhou233.juicemixin.example.TwoPrintsOrdinalMixin;
+import cn.xiaozhou233.juicemixin.tests.Operations;
+import cn.xiaozhou233.juicemixin.tests.OperationsAfterMixin;
+import cn.xiaozhou233.juicemixin.tests.OperationsMixin;
+import cn.xiaozhou233.juicemixin.tests.TwoPrints;
+import cn.xiaozhou233.juicemixin.tests.TwoPrintsOrdinalMixin;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;

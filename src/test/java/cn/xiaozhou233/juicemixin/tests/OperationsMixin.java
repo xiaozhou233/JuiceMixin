@@ -1,4 +1,4 @@
-package cn.xiaozhou233.juicemixin.example;
+package cn.xiaozhou233.juicemixin.tests;
 
 import cn.xiaozhou233.juicemixin.annotations.At;
 import cn.xiaozhou233.juicemixin.annotations.Inject;
@@ -11,7 +11,7 @@ public class OperationsMixin {
             desc = "()V",
             at = @At(
                     value = "FIELD",
-                    target = "cn/xiaozhou233/juicemixin/example/Operations.value:I"
+                    target = "cn/xiaozhou233/juicemixin/tests/Operations.value:I"
             )
     )
     private void onFieldRead() {

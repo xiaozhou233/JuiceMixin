@@ -1,21 +1,21 @@
-package cn.xiaozhou233.juicemixin.example;
+package cn.xiaozhou233.juicemixin.tests;
 
 import cn.xiaozhou233.juicemixin.annotations.At;
 import cn.xiaozhou233.juicemixin.annotations.Inject;
 import cn.xiaozhou233.juicemixin.annotations.Mixin;
 
-@Mixin(TwoPrints.class)
-public class TwoPrintsOrdinalMixin {
+@Mixin(Operations.class)
+public class OperationsAfterMixin {
     @Inject(
             method = "run",
             desc = "()V",
             at = @At(
                     value = "INVOKE",
                     target = "java/io/PrintStream.println(Ljava/lang/String;)V",
-                    ordinal = 1
+                    shift = At.Shift.AFTER
             )
     )
-    private void beforeSecondPrint() {
-        System.out.println("BEFORE SECOND");
+    private void onInvokeAfter() {
+        System.out.println("after");
     }
 }
